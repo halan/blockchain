@@ -2,12 +2,12 @@ require 'digest'
 require_relative 'miner'
 
 class Block
+  ROOT = :root
   attr_reader :hash, :payload, :parent
 
-  def initialize(payload = {})
+  def initialize(payload = {}, parent = ROOT)
     @payload = payload
-    @parent = @payload.fetch(:parent, nil)
-    @payload[:parent] = @parent.hash unless @parent.nil?
+    @parent = parent
 
     @hash = calculate_hash
   end
@@ -21,8 +21,12 @@ class Block
     @payload[:nounce]
   end
 
+  def parent_hash
+    parent == ROOT ? ROOT : parent.hash 
+  end
+
   def payload
-    @payload.merge(hash: @hash)
+    pre_hash.merge(hash: @hash )
   end
 
   def inspect
@@ -31,7 +35,11 @@ class Block
 
   private
 
+  def pre_hash
+    @payload.merge(parent: parent_hash )
+  end
+
   def calculate_hash
-    Digest::SHA1.hexdigest(@payload.to_s)
+    Digest::SHA1.hexdigest(pre_hash.to_s)
   end
 end

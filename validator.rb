@@ -1,3 +1,5 @@
+require_relative 'block'
+
 class Validator
   def initialize(constraint = Constraints::anything)
     @constraint = constraint
@@ -8,6 +10,6 @@ class Validator
   end
 
   def valid_chain?(block)
-    valid?(block) && (block.parent ? valid_chain?(block.parent) : true)
+    valid?(block) && (block.parent == Block::ROOT ? true : valid_chain?(block.parent))
   end
 end

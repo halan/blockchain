@@ -12,15 +12,15 @@ b1 = Block.new({a: 2})
 miner.mining!(b1)
 pp b1.payload
 
-b2 = Block.new({a: 4, parent: b1})
+b2 = Block.new({a: 4}, b1)
 miner.mining!(b2)
 pp b2.payload
 
-b3 = Block.new({a: 5, parent: b2})
+b3 = Block.new({a: 5}, b2)
 miner.mining!(b3)
 pp b3.payload
 
-b4 = Block.new({a: 7, parent: b3})
+b4 = Block.new({a: 7}, b3)
 miner.mining!(b4)
 pp b4.payload
 
