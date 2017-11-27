@@ -3,6 +3,7 @@ require_relative 'block'
 require_relative 'miner'
 require_relative 'validator'
 require_relative 'constraints'
+require_relative 'chain'
 
 constraint = Constraints::zeros(5)
 miner = Miner.new(constraint)
@@ -24,4 +25,4 @@ b4 = Block.new({a: 7}, b3)
 miner.mining!(b4)
 pp b4.payload
 
-p validator.valid_chain?(b4)
+p Chain.new(b4).all? {|b| validator.valid?(b) }
