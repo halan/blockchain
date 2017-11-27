@@ -5,24 +5,44 @@ require_relative 'validator'
 require_relative 'constraints'
 require_relative 'chain'
 
-constraint = Constraints::zeros(5)
-miner = Miner.new(constraint)
-validator = Validator.new(constraint)
+class Blockchain
+  include Enumerable
+  attr_reader :miner, :constraint, :validator, :root, :head
 
-b1 = Block.new({a: 2})
-miner.mining!(b1)
-pp b1.payload
+  def initialize(miner)
+    @miner = miner
+    @constraint = miner.constraint
+    @validator = Validator.new(@constraint) 
+    @root = Block.new({})
+    @head = @root
+  end
 
-b2 = Block.new({a: 4}, b1)
-miner.mining!(b2)
-pp b2.payload
+  def build_block(payload)
+    Block.new(payload, @head)
+  end
 
-b3 = Block.new({a: 5}, b2)
-miner.mining!(b3)
-pp b3.payload
+  def add_block(payload)
+    build_block(payload).tap do |block|
+      @miner.mining!(block)
+    end
+  end
+  alias :<< :add_block
 
-b4 = Block.new({a: 7}, b3)
-miner.mining!(b4)
-pp b4.payload
+  def each(&block)
+    Chain.new(@head).each(&block)
+  end
 
-p Chain.new(b4).all? {|b| validator.valid?(b) }
+  def valid?
+    all? {|block| validator.valid?(block) }
+  end
+end
+
+miner = Miner.new(Constraints::zeros(5))
+
+blockchain = Blockchain.new(miner)
+blockchain << {a: 2}
+blockchain << {a: 3}
+blockchain << {a: 4}
+blockchain << {a: 5}
+
+p blockchain.valid?
