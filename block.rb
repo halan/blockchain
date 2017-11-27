@@ -6,7 +6,7 @@ class Block
   attr_reader :hash, :payload, :parent
 
   def initialize(payload = {}, parent = ROOT)
-    @payload = payload.merge(parent: parent_hash)
+    @payload = payload
     @parent = parent
 
     @hash = calculate_hash
@@ -26,7 +26,7 @@ class Block
   end
 
   def payload
-    @payload.merge(hash: @hash )
+    pre_hash.merge(hash: @hash )
   end
 
   def inspect

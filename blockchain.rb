@@ -1,8 +1,5 @@
-require 'pp'
 require_relative 'block'
-require_relative 'miner'
 require_relative 'validator'
-require_relative 'constraints'
 require_relative 'chain'
 
 class Blockchain
@@ -13,7 +10,7 @@ class Blockchain
     @miner = miner
     @constraint = miner.constraint
     @validator = Validator.new(@constraint) 
-    @root = Block.new({})
+    @root = build_root
     @head = @root
   end
 
@@ -21,8 +18,12 @@ class Blockchain
     Block.new(payload, @head)
   end
 
+  def build_root
+    Block.new({})
+  end
+
   def add_block(payload)
-    build_block(payload).tap do |block|
+    @head = build_block(payload).tap do |block|
       @miner.mining!(block)
     end
   end
@@ -36,13 +37,3 @@ class Blockchain
     all? {|block| validator.valid?(block) }
   end
 end
-
-miner = Miner.new(Constraints::zeros(5))
-
-blockchain = Blockchain.new(miner)
-blockchain << {a: 2}
-blockchain << {a: 3}
-blockchain << {a: 4}
-blockchain << {a: 5}
-
-p blockchain.valid?
