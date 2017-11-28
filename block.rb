@@ -1,49 +1,46 @@
-require 'digest'
 require_relative 'miner'
+require_relative 'digest'
 
 class Block
-  ROOT = :root
-  attr_reader :hash, :payload, :parent
+  ROOT = 0.to_s(16).rjust(40, '0')
+  attr_reader :hash, :payload, :parent, :parent_hash, :nonce
 
-  def initialize(payload = {}, parent = ROOT)
-    @payload = payload
-    @parent = parent
+  def initialize(payload = {}, parent = nil)
+    @parent = parent || ROOT
+    @parent_hash = root? ? ROOT : parent.hash
+    @payload = payload.merge(parent: @parent_hash)
 
+    self.nonce = 0
+  end
+
+  def nonce=(nonce = 0)
+    @nonce = nonce
     @hash = calculate_hash
-  end
-
-  def nounce=(nounce = 0)
-    @payload[:nounce] = nounce
-    @hash = calculate_hash
-  end
-
-  def nounce
-    @payload[:nounce]
-  end
-
-  def parent_hash
-    root? ? ROOT : parent.hash 
   end
 
   def payload
-    pre_hash.merge(hash: @hash )
+    payload_with_nonce.merge(hash: hash)
   end
 
   def inspect
-    payload
+    Digest.text(payload)
   end
 
   def root?
     parent == ROOT
   end
 
+  def ==(block)
+    self.hash == block.hash
+  end
+
   private
 
-  def pre_hash
-    @payload.merge(parent: parent_hash )
+  def payload_with_nonce
+    @payload.merge(nonce: nonce)
   end
 
   def calculate_hash
-    Digest::SHA1.hexdigest(pre_hash.to_s)
+    Digest.digest(payload_with_nonce)
   end
 end

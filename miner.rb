@@ -1,21 +1,21 @@
 require_relative 'constraints'
-require_relative 'strategy'
+require_relative 'sequences'
 
 class Miner
-  attr_reader :constraint, :strategy
+  attr_reader :constraint, :sequence
 
   def initialize(
     constraint = Constraints::anything,
-    strategy = Strategy::incremental
+    sequence = Sequences::incremental
   )
     @constraint = constraint
-    @strategy = strategy
+    @sequence = sequence
   end
 
   def mining!(block)
-    @strategy.find do |nounce|
-      block.nounce = nounce
-      @constraint.call(block.hash)
+    sequence.find do |nonce|
+      block.nonce = nonce
+      constraint.call(block.hash)
     end
   end
 end

@@ -1,15 +1,18 @@
 class Chain
   include Enumerable
+  attr_reader :first
 
   def initialize(block)
     @first = block
   end
 
   def each
-    current = @first
-    begin
-      yield(current)
+    current = first
+    yield(current)
+
+    until current.root?
       current = current.parent
-    end until current.root?
+      yield(current)
+    end
   end
 end

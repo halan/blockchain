@@ -10,30 +10,35 @@ class Blockchain
     @miner = miner
     @constraint = miner.constraint
     @validator = Validator.new(@constraint) 
-    @root = build_root
-    @head = @root
   end
 
   def build_block(payload)
-    Block.new(payload, @head)
-  end
-
-  def build_root
-    Block.new({})
+    Block.new(payload, head)
   end
 
   def add_block(payload)
-    @head = build_block(payload).tap do |block|
-      @miner.mining!(block)
+    mining!(build_block(payload)).tap do |block|
+      @head = block
+      @root = block if @root.nil?
     end
   end
   alias :<< :add_block
 
   def each(&block)
-    Chain.new(@head).each(&block)
+    Chain.new(head).each(&block)
   end
 
   def valid?
     all? {|block| validator.valid?(block) }
+  end
+
+  def get(hash)
+    find{|block| block.hash == hash }
+  end
+
+  private
+
+  def mining!(block)
+    block.tap {|b| miner.mining!(b) } 
   end
 end

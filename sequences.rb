@@ -1,9 +1,6 @@
-module Strategy
+module Sequences
   def self.incremental
-    Enumerator.new do |y|
-      a = 0
-      loop { y << (a += 1) }
-    end
+    (0..Float::INFINITY  )
   end
 
   def self.random
