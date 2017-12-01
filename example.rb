@@ -8,11 +8,14 @@ loop do
   puts "Please, digit some content:"
   print "--> "
   content = gets
-  puts Time.now
   puts "Mining your content to store on the blockchain... (aprox. 10 minutes)"
   puts Time.now
   puts ""
-  p blockchain << { content: content.chomp }
+  blockchain.add_block({ content: content.chomp }) do |b|
+    print "\r#{b.nonce} -> #{b.hash}"
+  end
+  puts Time.now
+  p blockchain.head
   puts '---'
   puts "\t Your chain has #{blockchain.count} blocks!"
   puts '---'

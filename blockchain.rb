@@ -10,10 +10,10 @@ class Blockchain
     Block.new(payload, head)
   end
 
-  def add_block(payload)
-    mining!(build_block(payload)).tap do |block|
-      @head = block
-      @root = block if @root.nil?
+  def add_block(payload, &block)
+    mining!(build_block(payload), &block).tap do |blk|
+      @head = blk
+      @root = blk if @root.nil?
     end
   end
   alias :<< :add_block
@@ -23,7 +23,7 @@ class Blockchain
   end
 
   def valid?
-    all? {|b| Miner.valid?(b) }
+    all? {|b| Miner.new(b).valid? }
   end
 
   def get(hash)
@@ -32,7 +32,9 @@ class Blockchain
 
   private
 
-  def mining!(block)
-    block.tap {|b| Miner.mining!(b) } 
+  def mining!(blk, &block)
+    blk.tap do |b|
+      Miner.new(b).mining!(&block)
+    end
   end
 end

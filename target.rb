@@ -18,6 +18,10 @@ class Target
     [@n].pack('L').unpack('H*')[0].upcase
   end
 
+  def to_s
+    to_i.to_s(16).rjust(64, '0')
+  end
+
   def catch?(hexdigest)
     hexdigest.hex < to_i
   end

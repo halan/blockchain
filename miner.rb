@@ -1,16 +1,22 @@
-module Miner
+class Miner
 
-  module_function
+  def initialize(block)
+    @block = block
+    @target = block.target
+    @sequence = (0..Float::INFINITY)
+  end
 
-  def mining!(block, sequence=(0..Float::INFINITY))
-    sequence.find do |nonce|
-      block.nonce = nonce
-      valid? block
+  def mining!(&block)
+    @sequence.find do |nonce|
+      @block.nonce = nonce
+      valid?.tap do |valid|
+        block.call(@block) if block
+      end
     end
   end
 
-  def valid?(block)
-    block.target.catch? block.hash
+  def valid?
+    @target.catch? @block.hash
   end
 end
 
