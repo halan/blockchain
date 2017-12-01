@@ -9,10 +9,11 @@ loop do
   print "--> "
   content = gets
   puts "Mining your content to store on the blockchain... (aprox. 10 minutes)"
-  puts Time.now
+  t = Time.now
+  puts t
   puts ""
   blockchain.add_block({ content: content.chomp }) do |b|
-    print "\r#{b.nonce} -> #{b.hash}"
+    print "\r#{(b.nonce / (Time.now - t)).to_i}h/s  #{b.nonce} -> #{b.hash}"
   end
   puts Time.now
   p blockchain.head
