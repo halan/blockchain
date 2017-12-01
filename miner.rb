@@ -1,22 +1,16 @@
-require_relative 'constraints'
-require_relative 'sequences'
+module Miner
 
-class Miner
-  attr_reader :constraint, :sequence
+  module_function
 
-  def initialize(
-    constraint = Constraints::anything,
-    sequence = Sequences::incremental
-  )
-    @constraint = constraint
-    @sequence = sequence
-  end
-
-  def mining!(block)
+  def mining!(block, sequence=(0..Float::INFINITY))
     sequence.find do |nonce|
       block.nonce = nonce
-      constraint.call(block.hash)
+      valid? block
     end
+  end
+
+  def valid?(block)
+    block.target.catch? block.hash
   end
 end
 

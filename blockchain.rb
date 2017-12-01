@@ -1,16 +1,10 @@
 require_relative 'block'
-require_relative 'validator'
 require_relative 'chain'
+require_relative 'miner'
 
 class Blockchain
   include Enumerable
-  attr_reader :miner, :constraint, :validator, :root, :head
-
-  def initialize(miner)
-    @miner = miner
-    @constraint = miner.constraint
-    @validator = Validator.new(@constraint) 
-  end
+  attr_reader :root, :head
 
   def build_block(payload)
     Block.new(payload, head)
@@ -29,7 +23,7 @@ class Blockchain
   end
 
   def valid?
-    all? {|block| validator.valid?(block) }
+    all? {|b| Miner.valid?(b) }
   end
 
   def get(hash)
@@ -39,6 +33,6 @@ class Blockchain
   private
 
   def mining!(block)
-    block.tap {|b| miner.mining!(b) } 
+    block.tap {|b| Miner.mining!(b) } 
   end
 end

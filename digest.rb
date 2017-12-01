@@ -6,8 +6,10 @@ module Digest
   end
 
   def self.digest(hash)
-    Digest::SHA1.hexdigest(
-      text(hash)
+    Digest::SHA256.hexdigest(
+      Digest::SHA256.digest(
+        text(hash)
+      )
     )
   end
 end

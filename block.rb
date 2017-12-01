@@ -1,14 +1,20 @@
-require_relative 'miner'
+require_relative 'target'
 require_relative 'digest'
 
 class Block
-  ROOT = 0.to_s(16).rjust(40, '0')
-  attr_reader :hash, :payload, :parent, :parent_hash, :nonce
+  ROOT = '0'*64
+  DEFAULT_TARGET = 486604799
+  attr_reader :hash, :payload, :target, :parent, :parent_hash, :nonce
 
   def initialize(payload = {}, parent = nil)
     @parent = parent || ROOT
     @parent_hash = root? ? ROOT : parent.hash
-    @payload = payload.merge(parent: @parent_hash)
+    @target = Target.new(DEFAULT_TARGET) 
+
+    @payload = payload.merge(
+      parent: @parent_hash,
+      target: @target.bits
+    )
 
     self.nonce = 0
   end
